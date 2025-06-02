@@ -14,7 +14,7 @@ class PomodoroTimer {
         this.state = {
             currentSession: 1,
             sessionType: 'work', // 'work', 'shortBreak', 'longBreak'
-            timeRemaining: this.settings.workDuration * 60,
+            timeRemaining: 25 * 60, // Force 25 minutes (1500 seconds)
             isRunning: false,
             completedSessions: 0,
             isExtendedTime: false // Track if we're in the "after timer ends" period
@@ -28,6 +28,10 @@ class PomodoroTimer {
         
         this.initializeProgress();
         this.loadSettings();
+        
+        // Force set to 25 minutes after loading settings
+        this.state.timeRemaining = 25 * 60;
+        this.updateDisplay(); // Initialize display immediately
     }
     
     initializeProgress() {
@@ -51,7 +55,7 @@ class PomodoroTimer {
             const progress = (totalTime - this.state.timeRemaining) / totalTime;
             const offset = this.progressCircumference * (1 - progress);
             this.progressCircle.style.strokeDashoffset = offset;
-            this.progressCircle.style.stroke = 'var(--primary-color)';
+            this.progressCircle.style.stroke = 'rgba(139, 92, 246, 0.9)'; // Purple theme color
         }
     }
     
@@ -76,8 +80,10 @@ class PomodoroTimer {
     
     updateDisplay() {
         const timeDisplay = document.getElementById('timeDisplay');
-        const sessionType = document.getElementById('sessionType');
-        const sessionCount = document.getElementById('sessionCount');
+        
+        if (!timeDisplay) {
+            return;
+        }
         
         if (this.state.isExtendedTime) {
             // Show positive time during extended period with "+" prefix
@@ -86,32 +92,16 @@ class PomodoroTimer {
             timeDisplay.style.color = '#ffa726'; // Orange color for extended time
         } else {
             timeDisplay.textContent = this.formatTime(this.state.timeRemaining);
-            timeDisplay.style.color = 'var(--primary-color)';
+            timeDisplay.style.color = '#ffffff'; // White color for normal time
         }
         
-        sessionCount.textContent = this.state.currentSession;
-        
-        // Hide session type display
-        sessionType.style.display = 'none';
-        
-        // Update theme colors based on session type
-        this.updateThemeColors();
         this.updateProgress();
     }
     
     updateThemeColors() {
+        // Keep the glassmorphic purple theme instead of changing colors
         const root = document.documentElement;
-        switch (this.state.sessionType) {
-            case 'work':
-                root.style.setProperty('--primary-color', '#ff6b6b');
-                break;
-            case 'shortBreak':
-                root.style.setProperty('--primary-color', '#4ecdc4');
-                break;
-            case 'longBreak':
-                root.style.setProperty('--primary-color', '#74b9ff');
-                break;
-        }
+        root.style.setProperty('--primary-color', 'rgba(139, 92, 246, 0.9)');
     }
     
     start() {
@@ -142,6 +132,10 @@ class PomodoroTimer {
                     setTimeout(() => timerContent.classList.remove('pulse'), 500);
                     
                     this.updateDisplay();
+                    // Update button states through app
+                    if (window.app) {
+                        window.app.updateButtonStates();
+                    }
                 } else {
                     // Complete session normally
                     this.completeSession();
@@ -153,7 +147,10 @@ class PomodoroTimer {
             }
         }, 1000);
         
-        this.updatePlayPauseButton();
+        // Update button states through app
+        if (window.app) {
+            window.app.updateButtonStates();
+        }
     }
     
     setupNotificationTimers() {
@@ -195,7 +192,11 @@ class PomodoroTimer {
         this.state.isRunning = false;
         clearInterval(this.interval);
         this.clearNotificationTimers();
-        this.updatePlayPauseButton();
+        
+        // Update button states through app
+        if (window.app) {
+            window.app.updateButtonStates();
+        }
     }
     
     reset() {
@@ -204,7 +205,11 @@ class PomodoroTimer {
         this.state.isExtendedTime = false;
         this.state.timeRemaining = this.getCurrentSessionDuration() * 60;
         this.updateDisplay();
-        this.updatePlayPauseButton();
+        
+        // Update button states through app
+        if (window.app) {
+            window.app.updateButtonStates();
+        }
     }
     
     triggerAfterNotification() {
@@ -242,7 +247,11 @@ class PomodoroTimer {
         
         this.state.timeRemaining = this.getCurrentSessionDuration() * 60;
         this.updateDisplay();
-        this.updatePlayPauseButton();
+        
+        // Update button states through app
+        if (window.app) {
+            window.app.updateButtonStates();
+        }
         
         // Show notification for next session
         this.showNotification();
@@ -278,7 +287,11 @@ class PomodoroTimer {
         
         this.state.timeRemaining = this.getCurrentSessionDuration() * 60;
         this.updateDisplay();
-        this.updatePlayPauseButton();
+        
+        // Update button states through app
+        if (window.app) {
+            window.app.updateButtonStates();
+        }
         
         // Show notification
         this.showNotification();
@@ -293,20 +306,6 @@ class PomodoroTimer {
                 body: `${sessionName} is ready to start!`,
                 icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍅</text></svg>'
             });
-        }
-    }
-    
-    updatePlayPauseButton() {
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        const btnIcon = playPauseBtn.querySelector('.btn-icon');
-        const btnText = playPauseBtn.querySelector('.btn-text');
-        
-        if (this.state.isRunning) {
-            btnIcon.textContent = '⏸️';
-            btnText.textContent = 'Pause';
-        } else {
-            btnIcon.textContent = '▶️';
-            btnText.textContent = 'Start';
         }
     }
     

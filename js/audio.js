@@ -10,16 +10,34 @@ class AudioManager {
     
     initializeAudio() {
         // Initialize Web Audio API on user interaction
-        document.addEventListener('click', () => {
+        const initAudio = () => {
             if (!this.audioContext) {
                 this.createAudioContext();
             }
-        }, { once: true });
+        };
+        
+        // Listen for any user interaction to initialize audio - enhanced for mobile
+        document.addEventListener('click', initAudio, { once: true });
+        document.addEventListener('keydown', initAudio, { once: true });
+        document.addEventListener('touchstart', initAudio, { once: true, passive: true });
+        document.addEventListener('touchend', initAudio, { once: true, passive: true });
+        
+        // Additional mobile-specific initialization
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && this.audioContext && this.audioContext.state === 'suspended') {
+                this.audioContext.resume();
+            }
+        });
     }
     
     createAudioContext() {
         try {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Handle audio context state changes on mobile
+            if (this.audioContext.state === 'suspended') {
+                this.audioContext.resume();
+            }
         } catch (error) {
             console.warn('Web Audio API not supported:', error);
         }

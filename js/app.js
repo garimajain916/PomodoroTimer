@@ -4,23 +4,27 @@ class PomodoroApp {
         this.audioManager = window.audioManager;
         this.initializeElements();
         this.attachEventListeners();
-        this.initializeTheme();
         this.initializeSettings();
         this.requestNotificationPermission();
+        this.initializeMobileOptimizations();
     }
     
     initializeElements() {
+        // Timer display elements
+        this.timeDisplay = document.getElementById('timeDisplay');
+        this.sessionType = document.getElementById('sessionType');
+        this.sessionCount = document.getElementById('sessionCount');
+        this.progressCircle = document.querySelector('.progress-ring__circle');
+        
         // Control buttons
-        this.playPauseBtn = document.getElementById('playPauseBtn');
+        this.startBtn = document.getElementById('startBtn');
+        this.pauseBtn = document.getElementById('pauseBtn');
         this.resetBtn = document.getElementById('resetBtn');
         
         // Settings
         this.settingsBtn = document.getElementById('settingsBtn');
         this.settingsPanel = document.getElementById('settingsPanel');
         this.closeSettingsBtn = document.getElementById('closeSettings');
-        
-        // Theme toggle
-        this.themeToggle = document.getElementById('themeToggle');
         
         // Setting inputs
         this.workDurationInput = document.getElementById('workDuration');
@@ -41,8 +45,17 @@ class PomodoroApp {
     
     attachEventListeners() {
         // Timer controls
-        this.playPauseBtn.addEventListener('click', () => this.toggleTimer());
-        this.resetBtn.addEventListener('click', () => this.resetTimer());
+        if (this.startBtn) {
+            this.startBtn.addEventListener('click', () => this.startTimer());
+        }
+        
+        if (this.pauseBtn) {
+            this.pauseBtn.addEventListener('click', () => this.pauseTimer());
+        }
+        
+        if (this.resetBtn) {
+            this.resetBtn.addEventListener('click', () => this.resetTimer());
+        }
         
         // Settings
         this.settingsBtn.addEventListener('click', () => this.openSettings());
@@ -52,9 +65,6 @@ class PomodoroApp {
                 this.closeSettings();
             }
         });
-        
-        // Theme toggle
-        this.themeToggle.addEventListener('click', () => this.toggleTheme());
         
         // Settings inputs
         this.workDurationInput.addEventListener('input', (e) => {
@@ -102,16 +112,49 @@ class PomodoroApp {
         });
     }
     
+    startTimer() {
+        if (this.timer) {
+            this.timer.start();
+            this.updateButtonStates();
+        }
+    }
+    
+    pauseTimer() {
+        if (this.timer) {
+            this.timer.pause();
+            this.updateButtonStates();
+        }
+    }
+    
     toggleTimer() {
         if (this.timer.state.isRunning) {
-            this.timer.pause();
+            this.pauseTimer();
         } else {
-            this.timer.start();
+            this.startTimer();
         }
     }
     
     resetTimer() {
-        this.timer.reset();
+        if (this.timer) {
+            this.timer.reset();
+            this.updateButtonStates();
+        }
+    }
+    
+    updateButtonStates() {
+        const isRunning = this.timer.state.isRunning;
+        
+        this.startBtn.disabled = isRunning;
+        this.pauseBtn.disabled = !isRunning;
+        
+        // Update button appearance based on state
+        if (isRunning) {
+            this.startBtn.style.opacity = '0.5';
+            this.pauseBtn.style.opacity = '1';
+        } else {
+            this.startBtn.style.opacity = '1';
+            this.pauseBtn.style.opacity = '0.5';
+        }
     }
     
     openSettings() {
@@ -155,27 +198,9 @@ class PomodoroApp {
         this.timer1AfterValue.textContent = settings.timer1AfterMins;
         
         this.soundToggle.checked = this.audioManager.soundEnabled;
-    }
-    
-    initializeTheme() {
-        // Load saved theme
-        const savedTheme = localStorage.getItem('pomodoroTheme') || 'light';
-        this.setTheme(savedTheme);
-    }
-    
-    toggleTheme() {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        this.setTheme(newTheme);
-    }
-    
-    setTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('pomodoroTheme', theme);
         
-        // Update theme toggle icon
-        const themeIcon = this.themeToggle.querySelector('.theme-icon');
-        themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        // Set initial button states
+        this.updateButtonStates();
     }
     
     requestNotificationPermission() {
@@ -208,11 +233,19 @@ class PomodoroApp {
                 <span class="sound-icon">${sound.icon}</span>
                 <div class="sound-name">${sound.name}</div>
                 <div class="sound-description">${sound.description}</div>
-                <button class="sound-preview" title="Preview sound">▶</button>
+                <button class="sound-preview" title="Preview sound" aria-label="Preview ${sound.name}">▶</button>
             `;
             
-            // Handle sound selection
+            // Handle sound selection - improve for mobile
             soundOption.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('sound-preview')) {
+                    this.selectSound(key);
+                }
+            });
+            
+            // Handle sound selection on touch devices
+            soundOption.addEventListener('touchend', (e) => {
+                e.preventDefault();
                 if (!e.target.classList.contains('sound-preview')) {
                     this.selectSound(key);
                 }
@@ -221,6 +254,13 @@ class PomodoroApp {
             // Handle sound preview
             const previewBtn = soundOption.querySelector('.sound-preview');
             previewBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.previewSound(key);
+            });
+            
+            // Handle preview on touch
+            previewBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 this.previewSound(key);
             });
@@ -252,6 +292,77 @@ class PomodoroApp {
         // Only preview if sound is enabled
         if (this.soundToggle.checked) {
             this.audioManager.previewSound(soundKey);
+        }
+    }
+    
+    initializeMobileOptimizations() {
+        // Prevent double-tap zoom on iOS
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+        
+        // Optimize for mobile viewport changes
+        const handleViewportChange = () => {
+            // Update CSS custom property for viewport height
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        };
+        
+        window.addEventListener('resize', handleViewportChange);
+        window.addEventListener('orientationchange', handleViewportChange);
+        handleViewportChange();
+        
+        // Add touch feedback for buttons
+        this.addTouchFeedback();
+        
+        // Handle mobile keyboard
+        this.handleMobileKeyboard();
+    }
+    
+    addTouchFeedback() {
+        const touchElements = document.querySelectorAll('.control-btn, .settings-btn, .close-settings, .sound-option');
+        
+        touchElements.forEach(element => {
+            element.addEventListener('touchstart', () => {
+                element.style.transform = 'scale(0.95)';
+            }, { passive: true });
+            
+            element.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    element.style.transform = '';
+                }, 100);
+            }, { passive: true });
+            
+            element.addEventListener('touchcancel', () => {
+                element.style.transform = '';
+            }, { passive: true });
+        });
+    }
+    
+    handleMobileKeyboard() {
+        // Adjust layout when mobile keyboard appears
+        const initialViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        
+        const handleKeyboard = () => {
+            if (window.visualViewport) {
+                const currentHeight = window.visualViewport.height;
+                const diff = initialViewportHeight - currentHeight;
+                
+                if (diff > 150) { // Keyboard is likely open
+                    document.body.style.height = `${currentHeight}px`;
+                } else {
+                    document.body.style.height = '';
+                }
+            }
+        };
+        
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', handleKeyboard);
         }
     }
 }
