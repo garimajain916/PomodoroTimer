@@ -28,6 +28,8 @@ body {
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  padding: 0;
+  margin: 0;
 }
 
 /* Reset and Base Styles */
@@ -126,13 +128,15 @@ body::after {
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  padding: 0;
+  padding: 0.5rem;
   position: relative;
   z-index: 10;
   min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 /* Glassmorphic Card Container */
@@ -144,12 +148,13 @@ body::after {
   border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
   overflow: hidden;
-  padding: 2rem;
-  margin: 1rem;
+  padding: 1.5rem;
+  margin: 0.5rem;
   transition: all 0.3s ease;
   animation: gentle-glow 6s ease-in-out infinite alternate;
   width: 100%;
-  max-width: 500px;
+  max-width: 450px;
+  box-sizing: border-box;
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -297,18 +302,31 @@ header h1 {
 }
 
 .timer-display {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 1rem 0;
 }
 
 .progress-ring {
   position: relative;
   display: inline-block;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  aspect-ratio: 1;
 }
 
 .progress-svg {
   transform: rotate(-90deg);
   filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.3));
+  width: 100%;
+  height: 100%;
+  max-width: 280px;
+  max-height: 280px;
 }
 
 .progress-ring__circle-bg {
@@ -963,32 +981,46 @@ header h1 {
 /* Enhanced Responsive Design */
 @media (max-width: 768px) {
   .container {
-    padding: 0.5rem;
+    padding: 0.25rem;
     min-height: 100vh;
   }
   
   .card-container {
-    padding: 1.5rem;
-    margin: 0.5rem;
+    padding: 1.25rem;
+    margin: 0.25rem;
     border-radius: 1rem;
+    max-width: 100%;
+  }
+  
+  header {
+    margin-bottom: 1.5rem;
   }
   
   header h1 {
     font-size: 1.3rem;
   }
   
+  .timer-display {
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 0;
+  }
+  
+  .progress-ring {
+    max-width: 250px;
+  }
+  
   .progress-svg {
-    width: 260px;
-    height: 260px;
+    max-width: 250px;
+    max-height: 250px;
   }
   
   .timer-content {
-    width: 180px !important;
-    height: 180px !important;
+    width: 160px !important;
+    height: 160px !important;
   }
   
   .time-display {
-    font-size: 2.8rem !important;
+    font-size: 2.5rem !important;
   }
   
   .controls {
@@ -1011,31 +1043,40 @@ header h1 {
 
 @media (max-width: 600px) {
   .container {
-    padding: 0.25rem;
+    padding: 0.125rem;
   }
   
   .card-container {
-    padding: 1.25rem;
-    margin: 0.25rem;
+    padding: 1rem;
+    margin: 0.125rem;
     border-radius: 0.75rem;
   }
   
   header {
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .timer-display {
+    margin-bottom: 1.25rem;
+    padding: 0.25rem 0;
+  }
+  
+  .progress-ring {
+    max-width: 220px;
   }
   
   .progress-svg {
-    width: 240px;
-    height: 240px;
+    max-width: 220px;
+    max-height: 220px;
   }
   
   .timer-content {
-    width: 160px !important;
-    height: 160px !important;
+    width: 140px !important;
+    height: 140px !important;
   }
   
   .time-display {
-    font-size: 2.5rem !important;
+    font-size: 2.2rem !important;
   }
   
   .controls {
@@ -1091,22 +1132,30 @@ header h1 {
 
 @media (max-width: 480px) {
   .card-container {
-    padding: 1rem;
-    margin: 0.125rem;
+    padding: 0.875rem;
+    margin: 0.0625rem;
+  }
+  
+  .timer-display {
+    margin-bottom: 1rem;
+  }
+  
+  .progress-ring {
+    max-width: 200px;
   }
   
   .progress-svg {
-    width: 220px;
-    height: 220px;
+    max-width: 200px;
+    max-height: 200px;
   }
   
   .timer-content {
-    width: 150px !important;
-    height: 150px !important;
+    width: 130px !important;
+    height: 130px !important;
   }
   
   .time-display {
-    font-size: 2.2rem !important;
+    font-size: 2rem !important;
   }
   
   .control-btn {
@@ -1125,24 +1174,32 @@ header h1 {
 }
 
 @media (max-width: 400px) {
-  .progress-svg {
-    width: 200px;
-    height: 200px;
-  }
-  
-  .timer-content {
-    width: 140px !important;
-    height: 140px !important;
-  }
-  
-  .time-display {
-    font-size: 2rem !important;
-  }
-  
   .card-container {
     margin: 0;
     padding: 0.75rem;
     border-radius: 0.5rem;
+  }
+  
+  .timer-display {
+    margin-bottom: 0.875rem;
+  }
+  
+  .progress-ring {
+    max-width: 180px;
+  }
+  
+  .progress-svg {
+    max-width: 180px;
+    max-height: 180px;
+  }
+  
+  .timer-content {
+    width: 120px !important;
+    height: 120px !important;
+  }
+  
+  .time-display {
+    font-size: 1.8rem !important;
   }
   
   .controls {
@@ -1178,16 +1235,10 @@ header h1 {
   }
 }
 
-/* Landscape mobile optimization */
-@media (max-height: 600px) and (orientation: landscape) {
-  .container {
-    min-height: auto;
-    padding: 0.5rem;
-  }
-  
+/* Very small screens */
+@media (max-width: 360px) {
   .card-container {
-    padding: 1rem;
-    margin: 0.25rem;
+    padding: 0.625rem;
   }
   
   header {
@@ -1195,27 +1246,76 @@ header h1 {
   }
   
   .timer-display {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .progress-ring {
+    max-width: 160px;
   }
   
   .progress-svg {
-    width: 200px;
-    height: 200px;
+    max-width: 160px;
+    max-height: 160px;
   }
   
   .timer-content {
-    width: 140px !important;
-    height: 140px !important;
+    width: 110px !important;
+    height: 110px !important;
   }
   
   .time-display {
-    font-size: 2rem !important;
+    font-size: 1.6rem !important;
+  }
+  
+  .control-btn {
+    max-width: 160px;
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-height: 600px) and (orientation: landscape) {
+  .container {
+    min-height: auto;
+    padding: 0.25rem;
+  }
+  
+  .card-container {
+    padding: 0.75rem;
+    margin: 0.125rem;
+  }
+  
+  header {
+    margin-bottom: 0.75rem;
+  }
+  
+  .timer-display {
+    margin-bottom: 1rem;
+  }
+  
+  .progress-ring {
+    max-width: 160px;
+  }
+  
+  .progress-svg {
+    max-width: 160px;
+    max-height: 160px;
+  }
+  
+  .timer-content {
+    width: 110px !important;
+    height: 110px !important;
+  }
+  
+  .time-display {
+    font-size: 1.6rem !important;
   }
   
   .controls {
     flex-direction: row;
     gap: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
   }
   
   .control-btn {
