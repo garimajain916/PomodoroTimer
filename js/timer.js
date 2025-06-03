@@ -336,7 +336,12 @@ class PomodoroTimer {
     
     requestNotificationPermission() {
         if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
+            Notification.requestPermission().then(permission => {
+                // Track analytics for notification permission
+                if (window.analyticsManager) {
+                    window.analyticsManager.trackNotificationPermission(permission);
+                }
+            });
         }
     }
 }

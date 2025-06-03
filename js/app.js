@@ -93,6 +93,10 @@ class PomodoroApp {
         
         this.soundToggle.addEventListener('change', (e) => {
             this.audioManager.setSoundEnabled(e.target.checked);
+            // Track analytics
+            if (window.analyticsManager) {
+                window.analyticsManager.trackSoundToggle(e.target.checked);
+            }
         });
         
         // Initialize sound selection
@@ -103,11 +107,23 @@ class PomodoroApp {
             if (e.code === 'Space' && !this.isSettingsOpen()) {
                 e.preventDefault();
                 this.toggleTimer();
+                // Track analytics
+                if (window.analyticsManager) {
+                    window.analyticsManager.trackKeyboardShortcut('space');
+                }
             } else if (e.code === 'KeyR' && !this.isSettingsOpen()) {
                 e.preventDefault();
                 this.resetTimer();
+                // Track analytics
+                if (window.analyticsManager) {
+                    window.analyticsManager.trackKeyboardShortcut('r');
+                }
             } else if (e.code === 'Escape' && this.isSettingsOpen()) {
                 this.closeSettings();
+                // Track analytics
+                if (window.analyticsManager) {
+                    window.analyticsManager.trackKeyboardShortcut('escape');
+                }
             }
         });
     }
@@ -116,6 +132,11 @@ class PomodoroApp {
         if (this.timer) {
             this.timer.start();
             this.updateButtonStates();
+            
+            // Track analytics
+            if (window.analyticsManager) {
+                window.analyticsManager.trackTimerStart('work', this.timer.settings.workDuration);
+            }
         }
     }
     
@@ -123,6 +144,11 @@ class PomodoroApp {
         if (this.timer) {
             this.timer.pause();
             this.updateButtonStates();
+            
+            // Track analytics
+            if (window.analyticsManager) {
+                window.analyticsManager.trackTimerPause('work', this.timer.state.timeRemaining);
+            }
         }
     }
     
@@ -138,6 +164,11 @@ class PomodoroApp {
         if (this.timer) {
             this.timer.reset();
             this.updateButtonStates();
+            
+            // Track analytics
+            if (window.analyticsManager) {
+                window.analyticsManager.trackTimerReset('work', this.timer.state.timeRemaining);
+            }
         }
     }
     
@@ -160,6 +191,11 @@ class PomodoroApp {
     openSettings() {
         this.settingsPanel.classList.add('active');
         document.body.style.overflow = 'hidden';
+        
+        // Track analytics
+        if (window.analyticsManager) {
+            window.analyticsManager.trackSettingsOpen();
+        }
     }
     
     closeSettings() {
@@ -270,6 +306,11 @@ class PomodoroApp {
     }
     
     selectSound(soundKey) {
+        // Track analytics for sound change
+        if (window.analyticsManager) {
+            window.analyticsManager.trackSoundChange(soundKey);
+        }
+        
         // Update audio manager
         this.audioManager.setSelectedSound(soundKey);
         
@@ -289,6 +330,11 @@ class PomodoroApp {
     }
     
     previewSound(soundKey) {
+        // Track analytics for sound preview
+        if (window.analyticsManager) {
+            window.analyticsManager.trackSoundPreview(soundKey);
+        }
+        
         // Only preview if sound is enabled
         if (this.soundToggle.checked) {
             this.audioManager.previewSound(soundKey);

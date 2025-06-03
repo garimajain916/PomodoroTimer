@@ -11,6 +11,7 @@ A beautiful, minimalistic Pomodoro timer to boost your productivity and maintain
 - **Session Tracking** - Keep track of completed pomodoros
 - **Responsive Design** - Works seamlessly on desktop and mobile
 - **Dark/Light Mode** - Switch between themes for comfort
+- **Analytics Integration** - Firebase Analytics for usage insights and optimization
 
 ## 🚀 Demo
 
@@ -35,6 +36,7 @@ Work Session                    Break Time
 - **Styling**: CSS Grid, Flexbox, CSS Variables
 - **Audio**: Web Audio API
 - **Storage**: localStorage for preferences
+- **Analytics**: Firebase Analytics (Google Analytics 4)
 - **Build**: Vanilla JS (no framework dependencies)
 - **Deployment**: Vercel/Netlify
 
@@ -79,34 +81,26 @@ npm start
 3. **Customize**: Click settings to adjust work/break durations
 4. **Track Progress**: View your completed pomodoros in the session counter
 
-## ⚙️ Configuration
-
-The timer supports the following customizations:
-
-- **Work Duration**: 15-60 minutes (default: 25 minutes)
-- **Short Break**: 3-15 minutes (default: 5 minutes)
-- **Long Break**: 15-45 minutes (default: 15 minutes)
-- **Sessions Until Long Break**: 2-8 sessions (default: 4 sessions)
-- **Audio Notifications**: On/Off toggle
-- **Theme**: Light/Dark mode
-
 ## 📁 Project Structure
 
 ```
 PomodoroTimer/
-├── index.html          # Main HTML file
+├── index.html              # Main HTML file
 ├── css/
-│   ├── style.css       # Main styles
-│   └── themes.css      # Theme variables
+│   ├── style.css           # Main styles
+│   └── themes.css          # Theme variables
 ├── js/
-│   ├── app.js          # Main application logic
-│   ├── timer.js        # Timer functionality
-│   └── audio.js        # Audio notifications
+│   ├── app.js              # Main application logic
+│   ├── timer.js            # Timer functionality
+│   ├── audio.js            # Audio notifications
+│   ├── analytics.js        # Firebase Analytics manager
+│   └── analytics-integration.js # Analytics event tracking
 ├── assets/
-│   ├── sounds/         # Notification sounds
-│   └── icons/          # App icons
+│   ├── sounds/             # Notification sounds
+│   └── icons/              # App icons
+├── firebase-setup.md       # Firebase Analytics setup guide
 ├── README.md
-└── package.json        # Dependencies (optional)
+└── package.json            # Dependencies (optional)
 ```
 
 ## 🎨 Customization
@@ -148,6 +142,37 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - GitHub: [@yourusername](https://github.com/yourusername)
 - Email: your.email@example.com
+
+## 📊 Analytics
+
+This app includes Firebase Analytics to track usage patterns and improve user experience:
+
+### Tracked Events
+- Timer interactions (start, pause, reset, complete)
+- Settings changes and preferences
+- Session completions and productivity metrics
+- User engagement and feature usage
+- Performance metrics
+
+### Privacy
+- No personal data is collected
+- All analytics data is anonymized
+- GDPR and privacy regulation compliant
+- Users can opt-out of analytics
+
+### Setup
+To configure Firebase Analytics for your deployment, see the [Firebase Setup Guide](firebase-setup.md).
+
+## ⚙️ Configuration
+
+The timer supports the following customizations:
+
+- **Work Duration**: 15-60 minutes (default: 25 minutes)
+- **Short Break**: 3-15 minutes (default: 5 minutes)
+- **Long Break**: 15-45 minutes (default: 15 minutes)
+- **Sessions Until Long Break**: 2-8 sessions (default: 4 sessions)
+- **Audio Notifications**: On/Off toggle
+- **Theme**: Light/Dark mode
 
 ---
 
